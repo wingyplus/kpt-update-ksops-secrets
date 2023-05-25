@@ -26,3 +26,25 @@ jobs:
 
       - name: run integration image test
         run: earthly --ci --verbose --allow-privileged +integration-image-test
+
+  ci-images:
+    name: Build ${{ matrix.platform }} image
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            platform: linux/arm64
+          - os: ubuntu-latest
+            platform: linux/amd64
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodule: recursive
+
+      - uses: earthly/actions/setup-earthly@v1
+        with:
+          version: v0.6.23
+
+      - name: build
+        run: earthly --ci --verbose --platform ${{ matrix.platform }} +image --IMAGE_TAG="development"
